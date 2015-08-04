@@ -1,7 +1,7 @@
 
 $(document).ready(function(){
 
-	var m = 12, bh = 220, timer;
+	var m = 8, bh = 200, timer;
 
 	setGridSettings();
 
