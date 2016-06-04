@@ -18,10 +18,9 @@ shuffle($images);
 	<link rel="stylesheet" href="css/reset.css">
 	<link rel="stylesheet" href="css/grid.css">
 	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-	<script src="js/grid.js"></script>
 </head>
 <body>
-	<div class="grid">
+	<div id="grid">
 		<?php
 
 		// loop trough all the images
@@ -43,5 +42,6 @@ shuffle($images);
 
 		?>
 	</div>
+	<script src="js/grid.js"></script>
 </body>
 </html>

@@ -1,66 +1,67 @@
-$(document).ready(function(){
+var Grid = {
+	margin: 0, // Change this to your needs.
+	itemHeight: 220, // Change this to your needs.
 
-	// Define the items margin and height.
-	// Change this to your needs.
-	var margin = 0, itemHeight = 220;
-
-	// initialize the grid
-	initGrid();
-
-	var timer;
-	$(window).resize(function() {
-	    clearTimeout(timer);
-	    timer = setTimeout(function() {
-	        buildGrid();
-	    }, 400);
-	});
-
-	function initGrid(){
-		$body = $('body'),
-		$grid = $('.grid');
+	init: function () {
+		// Get body, grid and items
+        var body = document.getElementsByTagName('body')[0];
+		var grid = document.getElementById('grid');
+		var items = grid.children;
 
 		// Set all the items their height and margins
-		$(".item").each(function(){
-			$(this).css({
-				'height': itemHeight,
-				'marginRight': margin,
-				'marginBottom': margin
-			});
-		});
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+			item.height = this.itemHeight;
+			item.style.marginRight = this.margin + "px";
+			item.style.marginBottom = this.margin + "px";
+		}
 
 		// Set the grids margins
-		$grid.css({
-			'marginTop': margin,
-			'marginLeft': margin
-		});
+		grid.setAttribute("style","margin: " + this.margin + "px 0 0 " + this.margin + "px;");
 
-		// build the grid
-		buildGrid();
-	}
+		// Build the grid
+		this.build();
 
-	function buildGrid(){
-		// set body and grid width
-		var bodyWidth = $(window).width();
-		var gridWidth = bodyWidth - margin;
-		$body.width(bodyWidth);
-		$grid.width(gridWidth);
+		// Build the grid again after a resize
+		var timer = null;
+		window.addEventListener('resize', function(){
+			clearTimeout(timer);
+		    timer = setTimeout(function() {
+		        Grid.build();
+		    }, 400);
+		}, true);
+    },
+
+
+    build: function () {
+    	// Set body and grid width
+		var bodyWidth = window.innerWidth;
+		var gridWidth = bodyWidth - this.margin;
+
+		document.getElementsByTagName('body')[0].setAttribute("style","width: " + bodyWidth + "px");
+		document.getElementById('grid').style.width = gridWidth + "px";
 
 		// Declare variables
 		var rowWidth = 0, rowItems = [], rowItemsWidth = [];
 
 		// Loop trough all the items
-		$(".item").each(function(){
+		var items = grid.children;
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+
 			// Add current item to the row
-			rowItems.push($(this));
+			rowItems.push(item);
 
 			// Calculate current item width with the ratio
-			itemWidth = Math.floor((itemHeight * $(this).data('ratio')) + margin); 
+			itemWidth = Math.floor(this.itemHeight * item.dataset.ratio + this.margin); 
 
 			// Add current item width to an array
 			rowItemsWidth.push(itemWidth);
 
+			console.log(item);
+
 			// Set items its width
-			$(this).width(itemWidth - margin);
+			item.style.width = itemWidth - this.margin + "px";
 
 			// Add the item width to the row width
 			rowWidth+= itemWidth;
@@ -71,22 +72,26 @@ $(document).ready(function(){
 				widthDifference = rowWidth - gridWidth;
 
 				// loop trough all items in the current row to change their width
-				$.each(rowItems, function ( index ) {
+				for (var t = 0; t < rowItems.length; t++) {
+					var rowItem = rowItems[t];
+
 					// calculate how much pixels should be substracted from each item in the row
 					// the substract value of the last item may differ because of rounding
-					if (rowItems.length - 1 !== index){
+					if (rowItems.length - 1 !== t){
 						subtract = Math.floor(widthDifference / rowItems.length);
 					} else {
 						subtract = widthDifference - ((rowItems.length - 1) * Math.floor(widthDifference / rowItems.length));
 					}
 
 					// Change the item width
-					$(rowItems[index]).width(rowItemsWidth[index] - subtract - margin);
-				});
+					rowItems[t].style.width = rowItemsWidth[t] - subtract - this.margin + "px";
+				}
 
 				// Reset variables
 				rowItems = [], rowItemsWidth = [], rowWidth = 0;
 			}
-		});
-	}
-});
+		}
+    }
+}
+
+Grid.init();
