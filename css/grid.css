@@ -1,6 +1,7 @@
 /* 
-	http://tedgodyla.nl/gridsystem 
-  	v 0.0.1
+	Author: Ted Godyla
+	Author URL: http://tedgodyla.nl
+	Version: 1.0
   	License: none (public domain)
 */
 
@@ -26,7 +27,7 @@ body {
 	margin: 12px 0px 0px 12px;
 }
 
-.block {
+.item {
 	position: relative;
 	height: 220px;
 	width: 250px;
@@ -40,8 +41,12 @@ body {
 	background-color: #f8f8f8;
 }
 
-.clear {
+.grid::after {
+	display: block;
 	clear: both;
+	width: 0;
+	height: 0;
+	content: " ";
 }
 
 

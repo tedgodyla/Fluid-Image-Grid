@@ -1,65 +1,91 @@
-
 $(document).ready(function(){
 
-	var m = 8, bh = 200, timer;
+	// Define the items margin and height.
+	// Change this to your needs.
+	var margin = 0, itemHeight = 220;
 
-	setGridSettings();
+	// initialize the grid
+	initGrid();
 
+	var timer;
 	$(window).resize(function() {
 	    clearTimeout(timer);
 	    timer = setTimeout(function() {
-	        makeGrid();
+	        buildGrid();
 	    }, 400);
 	});
 
-	function setGridSettings(){
+	function initGrid(){
 		$body = $('body'),
 		$grid = $('.grid');
 
-		$(".block").each(function(){
+		// Set all the items their height and margins
+		$(".item").each(function(){
 			$(this).css({
-				'height': bh,
-				'marginRight': m,
-				'marginBottom': m
+				'height': itemHeight,
+				'marginRight': margin,
+				'marginBottom': margin
 			});
 		});
 
+		// Set the grids margins
 		$grid.css({
-			'marginTop': m,
-			'marginLeft': m
+			'marginTop': margin,
+			'marginLeft': margin
 		});
 
-		makeGrid();
+		// build the grid
+		buildGrid();
 	}
 
-	function makeGrid(){
-		var ww = $(window).width(),
-			g = ww - m;
+	function buildGrid(){
+		// set body and grid width
+		var bodyWidth = $(window).width();
+		var gridWidth = bodyWidth - margin;
+		$body.width(bodyWidth);
+		$grid.width(gridWidth);
 
-		$body.width(ww);
-		$grid.width(g);
+		// Declare variables
+		var rowWidth = 0, rowItems = [], rowItemsWidth = [];
 
-		var t = 0, b = [], wa = [], d = 0, s = 0, w = 0;
+		// Loop trough all the items
+		$(".item").each(function(){
+			// Add current item to the row
+			rowItems.push($(this));
 
-		$(".block").each(function(){
-			w = Math.floor((bh * $(this).data('width')) + m);
-			b.push($(this));
-			$(this).width(w - m);
-			wa.push(w);
-			t+= w;
+			// Calculate current item width with the ratio
+			itemWidth = Math.floor((itemHeight * $(this).data('ratio')) + margin); 
 
-			if (t > g){
-				d = t - g;
-				$.each(b, function( i ) {
-					if (b.length - 1 !== i){
-						s = Math.floor(d / b.length);
+			// Add current item width to an array
+			rowItemsWidth.push(itemWidth);
+
+			// Set items its width
+			$(this).width(itemWidth - margin);
+
+			// Add the item width to the row width
+			rowWidth+= itemWidth;
+
+			// if the rowWidth is higher then the gridWidth then we should resize the items in it.
+			if (rowWidth > gridWidth) {
+				// get the width difference between the row and grid
+				widthDifference = rowWidth - gridWidth;
+
+				// loop trough all items in the current row to change their width
+				$.each(rowItems, function ( index ) {
+					// calculate how much pixels should be substracted from each item in the row
+					// the substract value of the last item may differ because of rounding
+					if (rowItems.length - 1 !== index){
+						subtract = Math.floor(widthDifference / rowItems.length);
 					} else {
-						s = d - ((b.length - 1) * Math.floor(d / b.length));
+						subtract = widthDifference - ((rowItems.length - 1) * Math.floor(widthDifference / rowItems.length));
 					}
 
-					$(b[i]).width(wa[i] - s - m);
+					// Change the item width
+					$(rowItems[index]).width(rowItemsWidth[index] - subtract - margin);
 				});
-				wa = [], b = [], t = 0;
+
+				// Reset variables
+				rowItems = [], rowItemsWidth = [], rowWidth = 0;
 			}
 		});
 	}
